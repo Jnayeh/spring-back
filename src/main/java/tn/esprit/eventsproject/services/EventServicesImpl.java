@@ -34,7 +34,12 @@ public class EventServicesImpl implements IEventServices{
     @Override
     public Event addAffectEvenParticipant(Event event, int idParticipant) {
         Participant participant = participantRepository.findById(idParticipant).orElse(null);
-        if(participant.getEvents() == null){
+        if (participant ==null)
+            return null;
+        if(participant.getEvents() == null) {
+            if (participant.isOverBurdened()) {
+                return null;
+            }
             Set<Event> events = new HashSet<>();
             events.add(event);
             participant.setEvents(events);
@@ -49,6 +54,8 @@ public class EventServicesImpl implements IEventServices{
         Set<Participant> participants = event.getParticipants();
         for(Participant aParticipant:participants){
             Participant participant = participantRepository.findById(aParticipant.getIdPart()).orElse(null);
+            if (participant ==null)
+                continue;
             if(participant.getEvents() == null){
                 Set<Event> events = new HashSet<>();
                 events.add(event);
@@ -76,14 +83,13 @@ public class EventServicesImpl implements IEventServices{
     }
 
     @Override
-    public List<Logistics> getLogisticsDates(LocalDate date_debut, LocalDate date_fin) {
-        List<Event> events = eventRepository.findByDateDebutBetween(date_debut, date_fin);
+    public List<Logistics> getLogisticsDates(LocalDate dateDebut, LocalDate dateFin) {
+        List<Event> events = eventRepository.findByDateDebutBetween(dateDebut, dateFin);
 
         List<Logistics> logisticsList = new ArrayList<>();
         for (Event event:events){
             if(event.getLogistics().isEmpty()){
-
-                return null;
+                return new ArrayList<>();
             }
 
             else {
@@ -101,7 +107,6 @@ public class EventServicesImpl implements IEventServices{
     @Override
     public void calculCout() {
         List<Event> events = eventRepository.findByParticipants_NomAndParticipants_PrenomAndParticipants_Tache("Tounsi","Ahmed", Tache.ORGANISATEUR);
-    // eventRepository.findAll();
         float somme = 0f;
         for(Event event:events){
             log.info(event.getDescription());

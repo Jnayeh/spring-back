@@ -10,6 +10,7 @@ import java.util.Set;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -20,6 +21,7 @@ public class Participant implements Serializable {
     int idPart;
     String nom;
     String prenom;
+    boolean isOverBurdened;
     @Enumerated(EnumType.STRING)
     Tache tache;
     @ManyToMany
